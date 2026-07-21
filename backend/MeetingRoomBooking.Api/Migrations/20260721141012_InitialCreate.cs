@@ -57,9 +57,9 @@ namespace MeetingRoomBooking.Api.Migrations
                 {
                     { 1, 4, "Meeting Room 1" },
                     { 2, 8, "Meeting Room 2" },
-                    { 3, 20, "Conference Room 3" },
-                    { 4, 10, "Conference Room 4" },
-                    { 5, 15, "Conference Room 5" }
+                    { 3, 20, "Meeting Room 3" },
+                    { 4, 10, "Meeting Room 4" },
+                    { 5, 15, "Meeting Room 5" }
                 });
 
             migrationBuilder.CreateIndex(

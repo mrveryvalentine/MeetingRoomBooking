@@ -18,7 +18,7 @@ public class RoomService : IRoomService
     {
         return await _context.Rooms
             .AsNoTracking()
-            .OrderBy(r => r.Name)
+            .OrderBy(r => r.Id)
             .Select(r => new RoomResponse(
                 r.Id,
                 r.Name,

@@ -35,19 +35,19 @@ public class RoomConfiguration : IEntityTypeConfiguration<Room>
             new Room
             {
                 Id = 3,
-                Name = "Conference Room 3",
+                Name = "Meeting Room 3",
                 Capacity = 20
             },
             new Room
             {
                 Id = 4,
-                Name = "Conference Room 4",
+                Name = "Meeting Room 4",
                 Capacity = 10
             },
             new Room
             {
                 Id = 5,
-                Name = "Conference Room 5",
+                Name = "Meeting Room 5",
                 Capacity = 15
             });
     }

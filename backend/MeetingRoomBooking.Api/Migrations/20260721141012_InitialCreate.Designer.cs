@@ -87,19 +87,19 @@ namespace MeetingRoomBooking.Api.Migrations
                         {
                             Id = 3,
                             Capacity = 20,
-                            Name = "Conference Room 3"
+                            Name = "Meeting Room 3"
                         },
                         new
                         {
                             Id = 4,
                             Capacity = 10,
-                            Name = "Conference Room 4"
+                            Name = "Meeting Room 4"
                         },
                         new
                         {
                             Id = 5,
                             Capacity = 15,
-                            Name = "Conference Room 5"
+                            Name = "Meeting Room 5"
                         });
                 });
 

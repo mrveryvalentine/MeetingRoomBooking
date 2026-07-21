@@ -1,0 +1,219 @@
+<h2>Meeting Room Booking</h2>
+
+@if (error()) {
+<div class="error">
+    {{ error() }}
+</div>
+}
+
+<form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()">
+
+    <div class="form-field">
+        <label for="meetingTitle">Meeting Title</label>
+
+        <input
+            type="text"
+            id="meetingTitle"
+            formControlName="meetingTitle" />
+
+        @if (form.controls.meetingTitle.invalid &&
+             form.controls.meetingTitle.touched) {
+
+            <small class="validation">
+                Meeting title is required.
+            </small>
+
+        }
+
+    </div>
+
+    <div class="form-field">
+        <label for="organizer">Organizer</label>
+
+        <input
+            type="text"
+            id="organizer"
+            formControlName="organizer" />
+
+        @if (form.controls.organizer.invalid &&
+             form.controls.organizer.touched) {
+
+            <small class="validation">
+                Organizer is required.
+            </small>
+
+        }
+
+    </div>
+
+    <div class="form-field full-width">
+
+        <label for="roomId">Room</label>
+
+        <select
+            id="roomId"
+            formControlName="roomId">
+
+            <option [value]="0">
+                Select room
+            </option>
+
+            @for (room of rooms(); track room.id) {
+
+                <option [value]="room.id">
+                    {{ room.name }}
+                </option>
+
+            }
+
+        </select>
+
+        @if (form.controls.roomId.invalid &&
+             form.controls.roomId.touched) {
+
+            <small class="validation">
+                Please select a room.
+            </small>
+
+        }
+
+    </div>
+
+    <div class="form-field">
+
+        <label for="startTime">Start Time</label>
+
+        <input
+            type="datetime-local"
+            id="startTime"
+            formControlName="startTime" />
+
+        @if (form.controls.startTime.invalid &&
+             form.controls.startTime.touched) {
+
+            <small class="validation">
+                Start time is required.
+            </small>
+
+        }
+
+    </div>
+
+    <div class="form-field">
+
+        <label for="endTime">End Time</label>
+
+        <input
+            type="datetime-local"
+            id="endTime"
+            formControlName="endTime" />
+
+        @if (form.controls.endTime.invalid &&
+             form.controls.endTime.touched) {
+
+            <small class="validation">
+                End time is required.
+            </small>
+
+        }
+
+    </div>
+
+    <div class="actions">
+
+        <button
+            type="submit"
+            [disabled]="form.invalid || saving()">
+
+            {{ saving()
+                ? (editingId() ? 'Updating...' : 'Creating...')
+                : (editingId() ? 'Update Booking' : 'Create Booking') }}
+
+        </button>
+
+        @if (editingId()) {
+
+            <button
+                type="button"
+                class="cancel"
+                (click)="cancelEdit()">
+
+                Cancel
+
+            </button>
+
+        }
+
+    </div>
+
+</form>
+
+<h3>Existing Bookings ({{ bookings().length }})</h3>
+
+@if (bookings().length === 0) {
+
+    <p>No bookings found.</p>
+
+}
+@else {
+
+<table>
+
+    <thead>
+
+        <tr>
+            <th>Meeting</th>
+            <th>Organizer</th>
+            <th>Room</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Actions</th>
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+        @for (booking of bookings(); track booking.id) {
+
+        <tr>
+
+            <td>{{ booking.meetingTitle }}</td>
+            <td>{{ booking.organizer }}</td>
+            <td>{{ booking.roomName }}</td>
+            <td>{{ booking.startTime | date:'short' }}</td>
+            <td>{{ booking.endTime | date:'short' }}</td>
+
+            <td>
+
+                <button
+                    type="button"
+                    class="edit"
+                    (click)="editBooking(booking)">
+
+                    Edit
+
+                </button>
+
+                <button
+                    type="button"
+                    class="delete"
+                    (click)="deleteBooking(booking.id)">
+
+                    Delete
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        }
+
+    </tbody>
+
+</table>
+
+}
