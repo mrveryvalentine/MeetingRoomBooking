@@ -1,13 +1,12 @@
 # Technical Decisions
 
-This document briefly explains the architectural and technical decisions made while implementing the Meeting Room Booking application.
+This document explains the architectural and technical decisions made while implementing the Meeting Room Booking application.
 
 ## Goal
 
-The objective of this solution is not to build a production-ready booking platform, but to deliver a clean, maintainable, 
-and well-structured solution that satisfies the assignment requirements within the expected time frame (2–4 hours).
+The objective of this solution was not to build a production-ready booking platform, but to deliver a clean, maintainable, and well-structured solution that satisfies the assignment requirements within the expected implementation time (approximately 2–4 hours).
 
-The focus has been on simplicity, readability, and clear separation of responsibilities.
+The focus has been on simplicity, readability, separation of concerns, and implementing the required business rules correctly.
 
 ---
 
@@ -17,8 +16,7 @@ The focus has been on simplicity, readability, and clear separation of responsib
 
 ### ASP.NET Core 8 Web API
 
-I chose ASP.NET Core because it is the framework I have the most professional experience with. 
-It provides excellent support for REST APIs, dependency injection, validation, and testing.
+I chose ASP.NET Core because it is the framework I have the most professional experience with. It provides excellent support for REST APIs, dependency injection, model validation, middleware, and testing.
 
 ---
 
@@ -28,10 +26,12 @@ Entity Framework Core was selected because it provides:
 
 * Simple data access
 * Strong integration with ASP.NET Core
-* Migrations support
+* Migration support
 * Fast development for small to medium applications
 
-For this assignment I intentionally avoided introducing a Repository pattern, as EF Core already provides repository-like functionality through `DbContext`.
+For this assignment, I intentionally avoided introducing a Repository pattern, as EF Core already provides repository-like functionality through `DbContext`.
+
+Entity configuration and seed data are organized using `IEntityTypeConfiguration<T>` implementations to keep the `DbContext` focused on persistence.
 
 ---
 
@@ -54,7 +54,7 @@ For a larger production system, SQL Server or PostgreSQL would likely be a bette
 
 Angular was selected because it was specifically mentioned as a preferred framework in the assignment.
 
-The application uses:
+The frontend uses:
 
 * Standalone Components
 * Reactive Forms
@@ -63,11 +63,11 @@ The application uses:
 
 ---
 
-## Architecture
+# Architecture
 
 The application follows a simple layered architecture.
 
-### Backend
+## Backend
 
 ```
 Controllers
@@ -85,11 +85,11 @@ Responsibilities are separated as follows:
 * Services contain business logic.
 * Entity Framework Core manages persistence.
 
-This keeps controllers thin and business logic centralized.
+This keeps controllers thin while centralizing business rules inside the service layer.
 
 ---
 
-### Frontend
+## Frontend
 
 ```
 Pages
@@ -113,49 +113,60 @@ This keeps UI components reusable and easier to maintain.
 
 # Validation Strategy
 
-Validation is performed on both the client and the server.
+Validation is performed at multiple layers.
 
-## Client-side
+## Request Validation
 
-Angular Reactive Forms validate:
+The API uses ASP.NET Core model validation through Data Annotations to validate incoming requests before they reach the service layer.
+
+Examples include:
 
 * Required fields
-* Minimum and maximum lengths
-* Invalid input before submission
+* Maximum string lengths
+* Invalid request payloads
 
-This provides immediate feedback to the user.
+---
 
-## Server-side
+## Business Validation
 
-The API validates business rules, including:
+Business rules are implemented inside the service layer, including:
 
 * Room existence
 * Valid booking period
 * Prevention of overlapping bookings
 
-Server-side validation ensures data integrity even if the frontend is bypassed.
+Keeping business validation inside the service layer ensures these rules are enforced regardless of the client consuming the API.
 
 ---
 
 # Business Rule
 
-The most important business rule is that a meeting room cannot be booked if another booking already exists for the same room during the requested time period.
+The primary business rule is that a meeting room cannot be booked if another booking already exists for the same room during the requested time period.
 
-If an overlap is detected, the API returns an appropriate HTTP error together with a clear error message that is displayed by the frontend.
+The overlap check allows back-to-back meetings while preventing any intersecting booking periods.
 
 ---
 
 # Error Handling
 
-The API returns meaningful HTTP status codes together with descriptive messages.
+The application uses a centralized Global Exception Handler based on ASP.NET Core's `IExceptionHandler`.
 
-Examples include:
+This approach keeps controllers focused on request handling while providing consistent HTTP responses across the API.
 
-* Invalid input
-* Unknown room
-* Booking conflicts
+Custom exceptions include:
 
-The frontend displays these messages directly to the user instead of generic error dialogs.
+* `InvalidBookingException`
+* `RoomNotFoundException`
+* `BookingNotFoundException`
+* `BookingConflictException`
+
+These exceptions are translated into appropriate HTTP status codes such as:
+
+* 400 Bad Request
+* 404 Not Found
+* 409 Conflict
+
+This provides a consistent experience for API consumers and simplifies frontend error handling.
 
 ---
 
@@ -192,6 +203,6 @@ Given additional time, I would consider adding:
 
 # Summary
 
-My primary objective was to produce a solution that is easy to understand, easy to maintain, and straightforward to discuss during a technical review.
+The primary objective was to produce a solution that is easy to understand, easy to maintain, and straightforward to discuss during a technical review.
 
-Where trade-offs were necessary, I consistently preferred simplicity and readability over unnecessary abstraction.
+Where trade-offs were necessary, I consistently preferred simplicity and readability over unnecessary abstraction while ensuring the core business requirements were implemented correctly.
