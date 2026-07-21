@@ -49,11 +49,22 @@ export class Bookings implements OnInit {
   }
 
   onSubmit(): void {
+
+    this.error.set('');
+
+    const { startTime, endTime } = this.form.getRawValue();
+
+    if (new Date(endTime) <= new Date(startTime)) {
+      this.error.set('End time must be after start time.');
+      return;
+    }
+
     if (this.editingId() === null) {
       this.createBooking();
     } else {
       this.updateBooking();
     }
+
   }
 
   editBooking(booking: Booking): void {
@@ -98,14 +109,29 @@ export class Bookings implements OnInit {
     this.bookingService.deleteBooking(id)
       .subscribe({
 
-        next: () => this.loadBookings(),
+        next: () => {
+
+          this.error.set('');
+          this.loadBookings();
+
+        },
 
         error: err => {
 
-          this.error.set(
-            err.error?.message ??
-            'Unable to delete booking.'
-          );
+          if (err.status === 0) {
+
+            this.error.set(
+              'Cannot connect to the API. Please ensure the backend service is running.'
+            );
+
+          } else {
+
+            this.error.set(
+              err.error?.message ??
+              'Unable to delete booking.'
+            );
+
+          }
 
         }
 
@@ -115,20 +141,65 @@ export class Bookings implements OnInit {
 
   private loadRooms(): void {
 
+    this.error.set('');
+
     this.roomService.getRooms().subscribe({
-      next: rooms => this.rooms.set(rooms)
+
+      next: rooms => this.rooms.set(rooms),
+
+      error: err => {
+
+        if (err.status === 0) {
+
+          this.error.set(
+            'Cannot connect to the API. Please ensure the backend service is running.'
+          );
+
+        } else {
+
+          this.error.set(
+            err.error?.message ??
+            'Unable to load meeting rooms.'
+          );
+
+        }
+
+      }
+
     });
 
   }
 
   private loadBookings(): void {
 
+    this.error.set('');
+
     this.bookingService.getBookings().subscribe({
-      next: bookings => this.bookings.set(bookings)
+
+      next: bookings => this.bookings.set(bookings),
+
+      error: err => {
+
+        if (err.status === 0) {
+
+          this.error.set(
+            'Cannot connect to the API. Please ensure the backend service is running.'
+          );
+
+        } else {
+
+          this.error.set(
+            err.error?.message ??
+            'Unable to load bookings.'
+          );
+
+        }
+
+      }
+
     });
 
   }
-
   private createBooking(): void {
 
     if (this.form.invalid) {
@@ -146,10 +217,21 @@ export class Bookings implements OnInit {
 
         error: err => {
 
-          this.error.set(
-            err.error?.message ??
-            'Unable to create booking.'
-          );
+          if (err.status === 0) {
+
+              this.error.set(
+                  'Cannot connect to the API. Please ensure the backend service is running.'
+              );
+
+          }
+          else {
+
+              this.error.set(
+                  err.error?.message ??
+                  'Unable to create booking.'
+              );
+
+          }
 
           this.saving.set(false);
 
@@ -179,10 +261,20 @@ export class Bookings implements OnInit {
 
       error: err => {
 
-        this.error.set(
-          err.error?.message ??
-          'Unable to update booking.'
-        );
+        if (err.status === 0) {
+
+          this.error.set(
+            'Cannot connect to the API. Please ensure the backend service is running.'
+          );
+
+        } else {
+
+          this.error.set(
+            err.error?.message ??
+            'Unable to update booking.'
+          );
+
+        }
 
         this.saving.set(false);
 
