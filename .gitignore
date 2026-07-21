@@ -1,0 +1,28 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build folders
+bin/
+obj/
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Node
+node_modules/
+
+# Angular
+.angular/
+dist/
+
+# Logs
+*.log
+
+# Database
+*.db-shm
+*.db-wal
